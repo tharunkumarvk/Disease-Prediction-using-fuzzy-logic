@@ -38,7 +38,7 @@ Inputs → Preprocess → Fuzzify → Rule Evaluation → Aggregate → Defuzzif
 
 Core Components:
 - membership/: Functions & parameterization
-- rules/: Config definitions (YAML / JSON)
+- rules/: Config definitions (JSON)
 - engine/: Core inference logic
 - inference/: Execution orchestration + explanation
 - calibration/: Optional probability mapping
@@ -47,7 +47,7 @@ Core Components:
 
 ---
 
-## 📂 Suggested Structure
+## 📂 Structure
 
 ```
 .
@@ -139,18 +139,6 @@ rules:
 
 ---
 
-## 🔄 Inference Flow
-
-1. Load membership + rule configs  
-2. Normalize inputs (unit conversions / clamping)  
-3. Compute membership degrees  
-4. Evaluate rule antecedents (t-norm)  
-5. Aggregate consequents (s-norm + weighting)  
-6. Defuzzify (centroid / weighted average) → raw risk score  
-7. (Optional) Calibrate → probability  
-8. Emit explanation trace
-
----
 
 ## ⚙️ Installation
 
@@ -162,7 +150,7 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Suggested `requirements.txt` (if not yet created):
+`requirements.txt`:
 ```
 numpy
 scipy
@@ -172,102 +160,6 @@ fastapi
 uvicorn
 scikit-learn
 ```
-
----
-
-## ▶️ CLI Usage
-
-```bash
-python -m cli.run \
-  --temperature 38.2 \
-  --glucose 145 \
-  --heart_rate 102 \
-  --output json
-```
-
-Sample JSON:
-```json
-{
-  "inputs": {"temperature": 38.2, "glucose": 145, "heart_rate": 102},
-  "risk_score": 0.81,
-  "risk_label": "high",
-  "rules_fired": [
-    {
-      "id": "r1",
-      "antecedent_degree": 0.72,
-      "contribution": 0.51,
-      "description": "temperature is high AND glucose is elevated"
-    }
-  ]
-}
-```
-
----
-
-## 🌐 API (Planned)
-
-Start server:
-```bash
-uvicorn api.server:app --reload
-```
-
-Example request:
-```bash
-curl -X POST http://localhost:8000/infer \
-  -H "Content-Type: application/json" \
-  -d '{"temperature": 38.2, "glucose": 145, "heart_rate": 102}'
-```
-
----
-
-## 🧪 Testing
-
-```bash
-pytest -q
-```
-
-Test categories:
-- Membership functions (edge + nominal)
-- Rule combination logic
-- Defuzzification correctness
-- Calibration mapping stability
-- Explanation fidelity
-
----
-
-## 📊 Evaluation & Calibration
-
-If labeled data available:
-- Split dataset (train/calibrate/test)
-- Reliability curve (fuzzy score vs observed prevalence)
-- Fit logistic or isotonic calibrator
-- Metrics: AUC, Brier score, rule coverage %, explanation density
-
----
-
-## 🔍 Explainability
-
-Includes:
-- Active rules with degrees
-- Per-rule weighted contribution
-- Normalized risk label mapping
-- (Planned) Visual membership activation diagrams
-
----
-
-## 🛠️ Extending
-
-Add a variable:
-1. Define sets in `membership.yaml`
-2. Reference in new rules
-3. Update preprocessing (if needed)
-
-Add new disease module:
-- Add rule group with `context: <disease>`
-- Aggregate per-context and/or composite risk
-
-Switch t-norm / s-norm:
-- Configure in engine settings (e.g. `t_norm: product`, `s_norm: probabilistic_sum`)
 
 ---
 
@@ -292,19 +184,6 @@ For research / educational purposes only. Not a certified medical device. Do not
 
 ---
 
-## 🤝 Contributing
-
-1. Branch: `feat/<name>`  
-2. Add / adjust tests  
-3. Run lint + test suite  
-4. Open PR with rationale & calibration impact (if applicable)
-
-Principles:
-- Pure functions for fuzzy math
-- Config-first extensibility
-- Clear docstrings for new membership types
-
----
 
 ## 📄 License
 
@@ -312,10 +191,3 @@ MIT License (see LICENSE file).
 
 ---
 
-## 💬 Contact
-
-See profile contact links.
-
-> “Explainability accelerates trust more than opaque marginal gains.”
-
----
